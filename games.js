@@ -41,4 +41,18 @@ const GAMES = [
     desc:  "脱出ゲームです。パスワードは個人的に連絡してください。"
   },
 
+  {
+    title: "RICOCHET ARENA",
+    url:   "https://woody-510.github.io/ricochet-arena/",
+    img:   "images/ricochet-arena.png",
+    desc:  "シューティングゲームです。"
+  },
+
+  {
+    title: "TENWORLD DASH",
+    url:   "https://woody-510.github.io/tenworld-dash/",
+    img:   "images/tenworld-dash.png",
+    desc:  "右に向かって障害物を避けながら走るゲームです。"
+  },
+
 ];
