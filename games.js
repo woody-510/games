@@ -6,7 +6,7 @@
 
   {
     title: "ゲームタイトル",
-    url:   "https://ユーザー名.github.io/リポ名/",
+    url:   "https://woody-510.github.io/リポ名/",
     img:   "images/ファイル名.png",
     desc:  "ここに短い解説。"
   },
@@ -14,30 +14,31 @@
    img : images/ フォルダにスクショを放り込んで、その名前を書く。
          フルURL（https://...）でもOK。
          書かなくても（"" や 省略）動く → 絵文字＋単色の自動フォールバック。
+         画像のサイズ・縦横比はバラバラでOK。はみ出さず自動で収まる。
    icon: 画像が無いとき出る絵文字。省略時は 🎮。
    ========================================================================== */
 
 const GAMES = [
 
   {
-    title: "サンプルゲーム1",
-    url:   "https://example.com/",
-    img:   "images/sample1.png",
-    desc:  "ここに短い解説を書く。1〜2行がちょうどいい。"
+    title: "戦慄の迷宮",
+    url:   "https://woody-510.github.io/quizzes-mazes/",
+    img:   "images/quizzes-mazes.png",
+    desc:  "謎解きと迷路を融合させたミニゲームです。"
   },
 
   {
-    title: "サンプルゲーム2",
-    url:   "https://example.com/",
-    img:   "images/sample2.png",
-    desc:  "画像はまだ無くても動く。images/ に置いたら名前を書くだけ。"
+    title: "パーティーゲーム",
+    url:   "https://woody-510.github.io/wolf/",
+    img:   "images/wolf.png",
+    desc:  "パーティーゲームを作りました。新作追加予定。"
   },
 
   {
-    title: "画像なしの例",
-    url:   "https://example.com/",
-    icon:  "🧩",
-    desc:  "img を書かないと、絵文字＋自動の単色タイルになる。"
+    title: "叡明高校からの脱出",
+    url:   "https://woody-510.github.io/eimei-game/",
+    img:   "images/eimei-game.png",
+    desc:  "脱出ゲームです。パスワードは個人的に連絡してください。"
   },
 
 ];

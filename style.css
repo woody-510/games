@@ -13,8 +13,10 @@
   --accent3:   #ff4f7b;   /* ピンク */
   --border:    #ffffff;
   --px:        4px;       /* ドットの基準サイズ */
-  --card-blur: 3px;       /* ボタン背景画像のぼかし量（強くしたいなら増やす） */
-  --card-dark: .42;       /* ボタン背景の暗さ 0=真っ暗 1=そのまま */
+  --card-blur: 4px;       /* ボタン背景画像のぼかし量（強くしたいなら増やす） */
+  --card-bright: 1.15;    /* ボタン背景の明るさ 1=そのまま 1未満=暗く 1超=明るく
+                             文字の可読性は下部の黒グラデーションが担保するので、
+                             ここは「画像が見えるか」だけで決めていい */
   --font-en:   "Press Start 2P", monospace;
   --font-ja:   "DotGothic16", "MS Gothic", monospace;
 }
@@ -107,7 +109,7 @@ main{ max-width:1080px; margin:0 auto; padding:0 16px 64px; }
   background-image: var(--shot);
   background-size: cover;
   background-position: center;
-  filter: blur(var(--card-blur)) brightness(var(--card-dark)) saturate(1.15) contrast(1.05);
+  filter: blur(var(--card-blur)) brightness(var(--card-bright)) saturate(1.15) contrast(1.05);
   transition: filter .14s steps(3,end);
   z-index:0;
 }
@@ -141,7 +143,8 @@ main{ max-width:1080px; margin:0 auto; padding:0 16px 64px; }
     calc(var(--px)*3) calc(var(--px)*3) 0 calc(var(--px)*1) rgba(0,0,0,.65);
 }
 .card:hover::before, .card:focus-visible::before{
-  filter: blur(0px) brightness(.72) saturate(1.25) contrast(1.05);
+  /* ぼかしを外してクッキリ見せる。暗くしないので情報量が増える方向にだけ変わる */
+  filter: blur(0px) brightness(calc(var(--card-bright) + .1)) saturate(1.25) contrast(1.05);
 }
 .card:active{
   transform: translate(var(--px), var(--px));
