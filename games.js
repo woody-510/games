@@ -55,4 +55,31 @@ const GAMES = [
     desc:  "右に向かって障害物を避けながら走るゲームです。"
   },
 
+  /* ↓ここから下は games/ フォルダに直接置いているゲーム。
+     別リポジトリを作っていないので url は相対パスで書く。 */
+
+  {
+    title: "The Cursed Corridor",
+    url:   "games/cursed-corridor.html",
+    img:   "images/cursed-corridor.png"
+  },
+
+  {
+    title: "Cursed Memory Match",
+    url:   "games/cursed-memory.html",
+    img:   "images/cursed-memory.png"
+  },
+
+  {
+    title: "GEM MINER",
+    url:   "games/gem-miner.html",
+    img:   "images/gem-miner.png"
+  },
+
+  {
+    title: "Retro Dungeon Crawler",
+    url:   "games/retro-dungeon.html",
+    img:   "images/retro-dungeon.png"
+  },
+
 ];

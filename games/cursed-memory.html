@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cursed Memory Match</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --text-color: #e0e0e0;
+            --card-back: #1a1a1a;
+            --card-front: #2a2a2a;
+            --accent-red: #8a0000;
+            --accent-glow: #ff0000;
+            --border-color: #444;
+            --font-main: 'Courier New', Courier, monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Screens */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-color);
+            transition: opacity 0.5s ease;
+            z-index: 10;
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Titles & Text */
+        h1 {
+            font-size: 3rem;
+            color: var(--accent-red);
+            text-shadow: 0 0 10px var(--accent-red);
+            margin-bottom: 2rem;
+            text-align: center;
+            animation: pulse 3s infinite;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            max-width: 600px;
+            line-height: 1.5;
+        }
+
+        .stat-text {
+            font-size: 1.5rem;
+            margin: 1rem 0;
+            color: #ccc;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            font-family: var(--font-main);
+            color: var(--text-color);
+            background: rgba(138, 0, 0, 0.2);
+            border: 2px solid var(--accent-red);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn:hover {
+            background: var(--accent-red);
+            box-shadow: 0 0 20px var(--accent-glow);
+            text-shadow: 0 0 5px #fff;
+            transform: scale(1.05);
+        }
+
+        /* Game Board */
+        #game-screen {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #header-bar {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 20px;
+            padding: 0 20px;
+        }
+
+        #grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            max-width: 900px;
+            perspective: 1000px;
+        }
+
+        /* Cards */
+        .card {
+            width: 80px;
+            height: 110px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+            cursor: default;
+        }
+
+        .card.matched {
+            opacity: 0.3;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .card.disabled {
+            pointer-events: none;
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-front {
+            background-color: var(--card-front);
+            transform: rotateY(180deg);
+            color: #eee;
+            font-weight: bold;
+        }
+
+        .card-back {
+            background-color: var(--card-back);
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .card:hover .card-back {
+            border-color: #666;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% {
+                text-shadow: 0 0 10px var(--accent-red);
+                opacity: 0.8;
+            }
+
+            50% {
+                text-shadow: 0 0 20px var(--accent-glow);
+                opacity: 1;
+            }
+
+            100% {
+                text-shadow: 0 0 10px var(--accent-red);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translate(1px, 1px) rotate(0deg);
+            }
+
+            10% {
+                transform: translate(-1px, -2px) rotate(-1deg);
+            }
+
+            20% {
+                transform: translate(-3px, 0px) rotate(1deg);
+            }
+
+            30% {
+                transform: translate(3px, 2px) rotate(0deg);
+            }
+
+            40% {
+                transform: translate(1px, -1px) rotate(1deg);
+            }
+
+            50% {
+                transform: translate(-1px, 2px) rotate(-1deg);
+            }
+
+            60% {
+                transform: translate(-3px, 1px) rotate(0deg);
+            }
+
+            70% {
+                transform: translate(3px, 1px) rotate(-1deg);
+            }
+
+            80% {
+                transform: translate(-1px, -1px) rotate(1deg);
+            }
+
+            90% {
+                transform: translate(1px, 2px) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(1px, -2px) rotate(-1deg);
+            }
+        }
+
+        .shaking {
+            animation: shake 0.5s;
+            animation-iteration-count: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .card {
+                width: 55px;
+                height: 75px;
+                font-size: 1.8rem;
+            }
+
+            .card-back {
+                font-size: 1rem;
+            }
+
+            #grid-container {
+                gap: 8px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Toast Message */
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(50, 0, 0, 0.9);
+            border: 1px solid var(--accent-red);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+            z-index: 100;
+            font-size: 1.0rem;
+            text-align: center;
+        }
+
+        #toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Title Screen -->
+    <div id="title-screen" class="screen">
+        <h1>Cursed Memory Match</h1>
+        <p>Beware of the Jokers.<br>Pick the same trap twice, and your soul is lost.</p>
+        <button id="start-btn" class="btn">START GAME</button>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen hidden">
+        <div id="header-bar">
+            <span>Pairs: <span id="score-display">0</span>/12</span>
+            <span>Attempts: <span id="attempts-display">0</span></span>
+        </div>
+        <div id="grid-container">
+            <!-- Cards will be injected here -->
+        </div>
+    </div>
+
+    <!-- Result Screen -->
+    <div id="result-screen" class="screen hidden">
+        <h1 id="result-title">Title</h1>
+        <p id="result-message">Message</p>
+        <div class="stat-text">Final Score: <span id="final-score">0</span> Pairs</div>
+        <button id="restart-btn" class="btn">PLAY AGAIN</button>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast"></div>
+
+    <script>
+        // --- Configuration ---
+        const PAIRS_COUNT = 12;
+        // Symbol Set (ASCII - Maximum Compatibility)
+        const EMOJIS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
+        const JOKER_SYMBOL = '!!!';
+        const CARD_BACK_SYMBOL = '#';
+
+        // --- State ---
+        let cards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let attempts = 0;
+        let lockBoard = false;
+
+        // --- Elements ---
+        const titleScreen = document.getElementById('title-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const gridContainer = document.getElementById('grid-container');
+        const scoreDisplay = document.getElementById('score-display');
+        const attemptsDisplay = document.getElementById('attempts-display');
+        const resultTitle = document.getElementById('result-title');
+        const resultMessage = document.getElementById('result-message');
+        const finalScore = document.getElementById('final-score');
+        const toast = document.getElementById('toast');
+
+        // --- Toast ---
+        function showToast(msg, duration = 2000) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        // --- Initialization ---
+        document.getElementById('start-btn').addEventListener('click', startGame);
+        document.getElementById('restart-btn').addEventListener('click', startGame);
+
+        function startGame() {
+            titleScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+
+            matchedPairs = 0;
+            attempts = 0;
+            updateScoreUI();
+
+            generateCards();
+            renderBoard();
+        }
+
+        function updateScoreUI() {
+            scoreDisplay.textContent = matchedPairs;
+            attemptsDisplay.textContent = attempts;
+            finalScore.textContent = matchedPairs;
+        }
+
+        function generateCards() {
+            cards = [];
+            // Add Pairs
+            for (let i = 0; i < PAIRS_COUNT; i++) {
+                cards.push(createCardData('pair', EMOJIS[i]));
+                cards.push(createCardData('pair', EMOJIS[i]));
+            }
+            // Add Jokers
+            cards.push(createCardData('jokerA', JOKER_SYMBOL));
+            cards.push(createCardData('jokerB', JOKER_SYMBOL));
+
+            // Shuffle
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+
+            // Assign unique IDs
+            cards.forEach((card, index) => {
+                card.id = index;
+            });
+        }
+
+        function createCardData(type, emoji) {
+            return {
+                id: null,
+                type: type, // 'pair', 'jokerA', 'jokerB'
+                emoji: emoji,
+                isFlipped: false,
+                isMatched: false,
+                jokerVisits: 0
+            };
+        }
+
+        function renderBoard() {
+            gridContainer.innerHTML = '';
+            cards.forEach(card => {
+                const cardEl = document.createElement('div');
+                cardEl.classList.add('card');
+                cardEl.dataset.id = card.id;
+
+                const front = document.createElement('div');
+                front.classList.add('card-face', 'card-front');
+                front.textContent = card.emoji;
+                if (card.type.startsWith('joker')) {
+                    front.style.color = '#ff0000';
+                    front.style.textShadow = '0 0 5px #ff0000';
+                }
+
+                const back = document.createElement('div');
+                back.classList.add('card-face', 'card-back');
+                back.textContent = CARD_BACK_SYMBOL;
+
+                cardEl.appendChild(front);
+                cardEl.appendChild(back);
+                cardEl.addEventListener('click', () => handleCardClick(card.id));
+
+                gridContainer.appendChild(cardEl);
+            });
+        }
+
+        // --- Game Logic ---
+        function handleCardClick(id) {
+            if (lockBoard) return;
+            const card = cards[id];
+
+            if (card.isFlipped || card.isMatched) return;
+
+            flipCard(id);
+
+            // Joker Check
+            if (card.type.startsWith('joker')) {
+                card.jokerVisits++;
+
+                if (card.jokerVisits >= 2) {
+                    gameOver('Defeat', 'You triggered the curse. The same trap claimed you twice.');
+                    return;
+                } else {
+                    showToast("A cold breath touches your neck... (Don't touch this again)", 3000);
+                }
+            }
+
+            flippedCards.push(card);
+
+            if (flippedCards.length === 2) {
+                checkForMatch();
+            }
+        }
+
+        function flipCard(id) {
+            const card = cards[id];
+            card.isFlipped = true;
+            const cardEl = document.querySelector(`.card[data-id='${id}']`);
+            cardEl.classList.add('flipped');
+        }
+
+        function unflipCard(id) {
+            const card = cards[id];
+            card.isFlipped = false;
+            const cardEl = document.querySelector(`.card[data-id='${id}']`);
+            cardEl.classList.remove('flipped');
+        }
+
+        function checkForMatch() {
+            lockBoard = true;
+            attempts++;
+            updateScoreUI();
+
+            const [card1, card2] = flippedCards;
+
+            const isPair = (card1.type === 'pair' && card2.type === 'pair' && card1.emoji === card2.emoji);
+
+            if (isPair) {
+                matchedPairs++;
+                updateScoreUI();
+
+                if (matchedPairs === PAIRS_COUNT) {
+                    setTimeout(() => {
+                        disableCards();
+                        gameOver('Victory!', 'You broke the curse and found all pairs.');
+                    }, 1000);
+                } else {
+                    setTimeout(() => {
+                        disableCards();
+                        resetTurn(false);
+                    }, 1000);
+                }
+            } else {
+                setTimeout(() => {
+                    unflipCard(card1.id);
+                    unflipCard(card2.id);
+                    resetTurn(true);
+                }, 1000);
+            }
+        }
+
+        function disableCards() {
+            flippedCards.forEach(card => {
+                card.isMatched = true;
+                const cardEl = document.querySelector(`.card[data-id='${card.id}']`);
+                cardEl.classList.add('matched');
+            });
+        }
+
+        function resetTurn(wasMismatch) {
+            flippedCards = [];
+            lockBoard = false;
+        }
+
+        function gameOver(title, message) {
+            if (title === 'Defeat') {
+                document.body.classList.add('shaking');
+                setTimeout(() => document.body.classList.remove('shaking'), 500);
+            }
+
+            resultTitle.textContent = title;
+            resultMessage.textContent = message;
+
+            if (title === 'Victory!') {
+                resultTitle.style.color = '#4caf50';
+                resultTitle.style.textShadow = '0 0 10px #4caf50';
+            } else {
+                resultTitle.style.color = 'var(--accent-red)';
+                resultTitle.style.textShadow = '0 0 10px var(--accent-red)';
+            }
+
+            setTimeout(() => {
+                gameScreen.classList.add('hidden');
+                resultScreen.classList.remove('hidden');
+            }, 1000);
+        }
+
+    </script>
+</body>
+
+</html>
