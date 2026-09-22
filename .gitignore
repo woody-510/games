@@ -1,0 +1,7 @@
+# エディタ/OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ローカル確認用のプレビュー設定
+.claude/

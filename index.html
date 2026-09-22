@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>自作ゲーム置き場</title>
+<meta name="description" content="自作ブラウザゲームのリンク集">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><text y=%2213%22 font-size=%2213%22>🎮</text></svg>">
+</head>
+<body>
+
+<div class="scanlines" aria-hidden="true"></div>
+
+<header class="site-head">
+  <h1 class="site-title">自作ゲーム置き場</h1>
+  <p class="site-sub" id="sub">- SELECT A GAME -</p>
+</header>
+
+<main>
+  <div class="grid" id="grid"></div>
+  <p class="empty" id="empty" hidden>games.js にゲームを追加してください</p>
+</main>
+
+<footer class="site-foot">
+  <span id="count"></span>
+</footer>
+
+<!-- ===== モーダル（小ウィンドウ） ===== -->
+<div class="overlay" id="overlay" hidden>
+  <div class="window" role="dialog" aria-modal="true" aria-labelledby="m-title">
+    <div class="window-bar">
+      <span class="window-bar-title">GAME INFO</span>
+      <button class="window-x" id="m-x" type="button" aria-label="閉じる">×</button>
+    </div>
+    <div class="window-body">
+      <div class="m-shot" id="m-shot"></div>
+      <h2 class="m-title" id="m-title"></h2>
+      <p class="m-desc" id="m-desc"></p>
+      <a class="btn-play" id="m-play" href="#" target="_blank" rel="noopener noreferrer">▶ PLAY</a>
+      <button class="btn-close" id="m-close" type="button">とじる</button>
+    </div>
+  </div>
+</div>
+
+<script src="games.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

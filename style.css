@@ -1,0 +1,295 @@
+/* ==========================================================================
+   自作ゲーム置き場 -- レトロ8bit風スタイル
+   ゲームを追加するだけなら games.js だけ触れば良い。ここは見た目の調整用。
+   ========================================================================== */
+
+:root{
+  --bg:        #10131c;
+  --bg2:       #191f2e;
+  --ink:       #ffffff;
+  --dim:       #8b97b8;
+  --accent:    #ffd52e;   /* 黄 */
+  --accent2:   #2ee6a8;   /* 緑 */
+  --accent3:   #ff4f7b;   /* ピンク */
+  --border:    #ffffff;
+  --px:        4px;       /* ドットの基準サイズ */
+  --card-blur: 3px;       /* ボタン背景画像のぼかし量（強くしたいなら増やす） */
+  --card-dark: .42;       /* ボタン背景の暗さ 0=真っ暗 1=そのまま */
+  --font-en:   "Press Start 2P", monospace;
+  --font-ja:   "DotGothic16", "MS Gothic", monospace;
+}
+
+*{ box-sizing:border-box; }
+
+html,body{ margin:0; padding:0; }
+
+body{
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.022) 0 2px, transparent 2px 4px),
+    radial-gradient(1200px 600px at 50% -10%, #23305a 0%, var(--bg) 70%);
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: var(--font-en), var(--font-ja);
+  line-height:1.7;
+  min-height:100vh;
+  -webkit-font-smoothing:none;
+}
+
+/* 走査線オーバーレイ（CRT感） */
+.scanlines{
+  position:fixed; inset:0; pointer-events:none; z-index:50;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 1px, transparent 1px 3px);
+  mix-blend-mode:multiply;
+}
+
+/* ---------- ヘッダー ---------- */
+.site-head{
+  text-align:center;
+  padding: 56px 16px 28px;
+}
+.site-title{
+  font-family: var(--font-en), var(--font-ja);
+  font-size: clamp(22px, 5.2vw, 44px);
+  margin:0;
+  letter-spacing:.04em;
+  color: var(--accent);
+  text-shadow:
+     var(--px) var(--px) 0 #a8730a,
+     calc(var(--px)*2) calc(var(--px)*2) 0 rgba(0,0,0,.55);
+}
+.site-sub{
+  font-family: var(--font-en), var(--font-ja);
+  font-size: clamp(9px, 2.2vw, 13px);
+  color: var(--accent2);
+  margin: 22px 0 0;
+  letter-spacing:.18em;
+  animation: blink 1.2s steps(1,end) infinite;
+}
+@keyframes blink{ 0%,49%{opacity:1} 50%,100%{opacity:.15} }
+
+/* ---------- グリッド ---------- */
+main{ max-width:1080px; margin:0 auto; padding:0 16px 64px; }
+
+.grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 22px;
+}
+
+/* ---------- ゲームボタン（カード） ---------- */
+.card{
+  position:relative;
+  display:flex; align-items:flex-end;
+  min-height:150px;
+  padding:16px;
+  overflow:hidden;
+  cursor:pointer;
+  background: var(--bg2);
+  color: var(--ink);
+  border:none;
+  text-align:left;
+  font-family:inherit;
+  /* 8bitな太枠（枠画像を用意しなくても出せる） */
+  box-shadow:
+    0 0 0 var(--px) #000,
+    0 0 0 calc(var(--px)*2) var(--border),
+    0 0 0 calc(var(--px)*3) #000,
+    calc(var(--px)*2) calc(var(--px)*2) 0 calc(var(--px)*1) rgba(0,0,0,.6);
+  transition: transform .09s steps(2,end), box-shadow .09s steps(2,end);
+}
+
+/* 背景画像はこの擬似要素に敷く。ここで自動でぼかす＆暗くする
+   → ぼかし済みの画像を用意する必要なし */
+.card::before{
+  content:"";
+  position:absolute;
+  inset: calc(var(--card-blur) * -4);   /* ぼかしの端が出ないよう外へはみ出させる */
+  background-image: var(--shot);
+  background-size: cover;
+  background-position: center;
+  filter: blur(var(--card-blur)) brightness(var(--card-dark)) saturate(1.15) contrast(1.05);
+  transition: filter .14s steps(3,end);
+  z-index:0;
+}
+/* 下側をさらに暗くして文字を確実に読ませる */
+.card::after{
+  content:"";
+  position:absolute; inset:0; z-index:1;
+  background: linear-gradient(to top, rgba(0,0,0,.82) 0%, rgba(0,0,0,.35) 45%, rgba(0,0,0,.05) 100%);
+}
+
+.card-label{
+  position:relative; z-index:2;
+  font-family: var(--font-ja);
+  font-size: 17px;
+  font-weight:400;
+  line-height:1.45;
+  text-shadow:
+    2px 2px 0 #000, -2px 2px 0 #000, 2px -2px 0 #000, -2px -2px 0 #000,
+    0 3px 0 #000, 0 0 12px rgba(0,0,0,.9);
+  word-break: break-word;
+}
+
+/* ホバー/フォーカスで画像がクッキリ見える */
+.card:hover, .card:focus-visible{
+  transform: translate(calc(var(--px)*-1), calc(var(--px)*-1));
+  outline:none;
+  box-shadow:
+    0 0 0 var(--px) #000,
+    0 0 0 calc(var(--px)*2) var(--accent),
+    0 0 0 calc(var(--px)*3) #000,
+    calc(var(--px)*3) calc(var(--px)*3) 0 calc(var(--px)*1) rgba(0,0,0,.65);
+}
+.card:hover::before, .card:focus-visible::before{
+  filter: blur(0px) brightness(.72) saturate(1.25) contrast(1.05);
+}
+.card:active{
+  transform: translate(var(--px), var(--px));
+}
+
+/* 画像が無いときのフォールバック */
+.card.no-shot::before{
+  background-image:none;
+  background-color: var(--tint, #2b3450);
+  filter:none;
+  inset:0;
+}
+.card-icon{
+  position:absolute; inset:0; z-index:1;
+  display:flex; align-items:center; justify-content:center;
+  font-size:56px;
+  filter: drop-shadow(3px 3px 0 rgba(0,0,0,.5));
+}
+
+.empty{
+  font-family: var(--font-ja);
+  color: var(--dim);
+  text-align:center;
+  padding:48px 0;
+}
+
+/* ---------- フッター ---------- */
+.site-foot{
+  text-align:center;
+  padding: 0 16px 48px;
+  font-size:10px;
+  color: var(--dim);
+  letter-spacing:.14em;
+}
+
+/* ---------- モーダル（小ウィンドウ） ---------- */
+.overlay{
+  position:fixed; inset:0; z-index:60;
+  display:flex; align-items:center; justify-content:center;
+  padding:16px;
+  background: rgba(4,6,12,.82);
+  animation: fade .12s steps(2,end);
+}
+/* display:flex が hidden 属性を打ち消してしまうので明示的に戻す */
+.overlay[hidden]{ display:none; }
+@keyframes fade{ from{opacity:0} to{opacity:1} }
+
+.window{
+  width:100%; max-width:420px;
+  max-height: calc(100vh - 32px);
+  display:flex; flex-direction:column;
+  background: var(--bg2);
+  box-shadow:
+    0 0 0 var(--px) #000,
+    0 0 0 calc(var(--px)*2) var(--border),
+    0 0 0 calc(var(--px)*3) #000,
+    calc(var(--px)*3) calc(var(--px)*3) 0 calc(var(--px)*2) rgba(0,0,0,.7);
+  animation: pop .14s steps(3,end);
+}
+@keyframes pop{ from{ transform:scale(.88) } to{ transform:scale(1) } }
+
+.window-bar{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:8px;
+  padding:10px 10px 10px 12px;
+  background: var(--accent);
+  color:#1a1400;
+  flex:0 0 auto;
+}
+.window-bar-title{ font-size:10px; letter-spacing:.16em; }
+.window-x{
+  font-family:inherit; font-size:14px; line-height:1;
+  width:28px; height:28px;
+  background:#1a1400; color:var(--accent);
+  border:none; cursor:pointer;
+}
+.window-x:hover{ background:var(--accent3); color:#fff; }
+
+.window-body{
+  padding:18px;
+  overflow-y:auto;
+  flex:1 1 auto;
+}
+
+/* モーダル内の画像はぼかさず、ドット感を保って表示 */
+.m-shot{
+  width:100%;
+  aspect-ratio: 16 / 10;
+  background-size: cover;
+  background-position:center;
+  background-color:#0b0e16;
+  image-rendering: pixelated;
+  box-shadow: 0 0 0 var(--px) #000, 0 0 0 calc(var(--px)*1.5) #4a5680;
+  margin-bottom:20px;
+}
+.m-shot.no-shot{
+  display:flex; align-items:center; justify-content:center;
+  font-size:64px;
+}
+
+.m-title{
+  font-family: var(--font-ja);
+  font-size:20px; margin:0 0 10px;
+  color:var(--accent);
+  text-shadow: 2px 2px 0 rgba(0,0,0,.6);
+  word-break:break-word;
+}
+.m-desc{
+  font-family: var(--font-ja);
+  font-size:15px; color:#d6def5;
+  margin:0 0 22px;
+  word-break:break-word;
+}
+
+.btn-play, .btn-close{
+  display:block; width:100%;
+  padding:15px 10px;
+  font-family: var(--font-en), var(--font-ja);
+  font-size:13px; letter-spacing:.1em;
+  text-align:center; text-decoration:none;
+  cursor:pointer; border:none;
+  box-shadow: 0 0 0 var(--px) #000, var(--px) var(--px) 0 0 rgba(0,0,0,.65);
+  transition: transform .08s steps(2,end);
+}
+.btn-play{
+  background: var(--accent2); color:#00231a;
+  margin-bottom:12px;
+}
+.btn-play:hover{ background:#4dffc4; }
+.btn-close{
+  background:#39425e; color:#c8d2ee;
+  font-family: var(--font-ja); font-size:14px;
+}
+.btn-close:hover{ background:#4a5578; }
+.btn-play:active, .btn-close:active{
+  transform: translate(var(--px), var(--px));
+  box-shadow: 0 0 0 var(--px) #000;
+}
+
+/* ---------- スマホ ---------- */
+@media (max-width:520px){
+  .grid{ grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap:18px; }
+  .card{ min-height:120px; padding:12px; }
+  .card-label{ font-size:14px; }
+  .site-head{ padding:36px 16px 20px; }
+}
+
+/* アニメーションを減らす設定を尊重 */
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{ animation:none !important; transition:none !important; }
+}
