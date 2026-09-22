@@ -61,25 +61,29 @@ const GAMES = [
   {
     title: "The Cursed Corridor",
     url:   "games/cursed-corridor.html",
-    img:   "images/cursed-corridor.png"
+    img:   "images/cursed-corridor.png",
+    desc:  "ジャンプで障害物を避け続けるホラー風のランゲームです。"
   },
 
   {
     title: "Cursed Memory Match",
     url:   "games/cursed-memory.html",
-    img:   "images/cursed-memory.png"
+    img:   "images/cursed-memory.png",
+    desc:  "ホラー風の神経衰弱です。ジョーカーに気をつけてください。"
   },
 
   {
     title: "GEM MINER",
     url:   "games/gem-miner.html",
-    img:   "images/gem-miner.png"
+    img:   "images/gem-miner.png",
+    desc:  "クリックで宝石を掘って設備を強化していく放置ゲームです。"
   },
 
   {
     title: "Retro Dungeon Crawler",
     url:   "games/retro-dungeon.html",
-    img:   "images/retro-dungeon.png"
+    img:   "images/retro-dungeon.png",
+    desc:  "全10ステージの迷宮を探索するダンジョンゲームです。"
   },
 
 ];
